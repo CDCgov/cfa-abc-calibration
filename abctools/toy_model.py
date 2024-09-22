@@ -26,7 +26,7 @@ def ctmc_gillespie_model(initial_state, params, tmax, t=0, random_seed=None):
     Example usage:
         # Define initial conditions and parameters
         initial_state = (990, 10, 0)
-        params = (0.3, 0.1) 
+        params = (0.3, 0.1)
 
         # Run simulation up to time tmax=100
         time_points, susceptible_counts, infected_counts, recovered_counts = ctmc_gillespie_model(
