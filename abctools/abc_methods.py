@@ -49,9 +49,9 @@ def draw_simulation_parameters(
 
         # Create the appropriate sampler based on the chosen method
         sampler = (
-            qmc.Sobol(d=num_params)
+            qmc.Sobol(d=num_params, seed=seed)
             if method == "sobol"
-            else qmc.LatinHypercube(d=num_params)
+            else qmc.LatinHypercube(d=num_params, seed=seed)
         )
 
         # Generate uniform samples across all dimensions
