@@ -306,8 +306,8 @@ class SimulationBundle:
         if not hasattr(self, "distances"):
             raise ValueError("Distances have not been calculated.")
 
-        # Calculate the number of simulations to accept based on the given proportion
-        num_to_accept = int(len(self.distances) * proportion)
+        # Calculate the number of simulations to accept based on the given proportion (minimum of 1)
+        num_to_accept = max(1,int(len(self.distances) * proportion))
 
         # Sort simulations by distance in ascending order and select the best ones
         sorted_simulations = sorted(self.distances.items(), key=lambda item: item[1])
