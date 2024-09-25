@@ -285,6 +285,50 @@ class SimulationBundle:
                 # Add filtered parameters to the dictionary of accepted simulations
                 self.accepted[sim_number] = accepted_params
 
+    def accept_proportion(self, proportion):
+        """
+        Accepts a specified proportion of simulations with the smallest distances. 
+        This method ranks all simulations by their distance values in ascending order 
+        and selects the top-performing simulations up to the specified proportion.
+
+        Args:
+            proportion (float): The proportion of top simulations to accept based on their distances.
+                                For example, 0.1 for the top 10%, or 0.25 for the top 25%.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If distances have not been previously calculated.
+        """
+
+        # Ensure distances have been calculated
+        if not hasattr(self, "distances"):
+            raise ValueError("Distances have not been calculated.")
+
+        # Calculate the number of simulations to accept based on the given proportion
+        num_to_accept = int(len(self.distances) * proportion)
+
+        # Sort simulations by distance in ascending order and select the best ones
+        sorted_simulations = sorted(self.distances.items(), key=lambda item: item[1])
+        
+        # Initialize/clear accepted simulations dictionary
+        self.accepted = {}
+
+        # Accept only the top-performing simulations as determined by the specified proportion
+        for sim_number, distance in sorted_simulations[:num_to_accept]:
+            # Retrieve and clean input parameters for each accepted simulation
+            accepted_params = self.inputs.filter(
+                pl.col("simulation") == sim_number
+            )
+            if "simulation" in accepted_params.columns:
+                accepted_params = accepted_params.drop("simulation")
+            if "randomSeed" in accepted_params.columns:
+                accepted_params = accepted_params.drop("randomSeed")
+
+            # Store parameters of accepted simulations in an attribute for later use or analysis
+            self.accepted[sim_number] = accepted_params
+
     def merge_with(self, other_bundle):
         """
         Merges another SimulationBundle object into this one by combining their inputs,
