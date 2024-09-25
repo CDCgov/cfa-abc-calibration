@@ -13,6 +13,7 @@ def draw_simulation_parameters(
     add_random_seed: bool = True,
     add_simulation_id: bool = True,
     starting_simulation_number: int = 0,
+    seed = None,
 ) -> pl.DataFrame:
     """
     Draw samples of parameters for simulations based on the specified method.
@@ -24,11 +25,16 @@ def draw_simulation_parameters(
         add_random_seed (bool): If True, adds a 'randomSeed' column with randomly generated numbers.
         add_simulation_id (bool): If True, adds a 'simulation' column with simulation IDs starting from `starting_simulation_number`.
         starting_simulation_number (int): The number at which to start numbering simulations. Defaults to 0.
+        seed (int): Random seed passed in to ensure consistency between runs.
 
     Returns:
         pd.DataFrame: DataFrame containing arrays of sampled values for each parameter,
                       possibly including 'random_seed' and 'simulation' columns.
     """
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+        
     num_params = len(params_inputs)
 
     if method == "random":
@@ -108,6 +114,7 @@ def resample(
     weights=None,
     add_random_seed: bool = True,
     starting_simulation_number=0,
+    seed = None
 ):
     """
     Resamples parameters from accepted simulations with optional perturbation and reweighting.
@@ -120,10 +127,15 @@ def resample(
         weights (dict or None): Optional dictionary of weights for each accepted simulation. If None, uniform weighting is assumed.
         add_random_seed (bool): If True, adds a 'random_seed' column with randomly generated numbers.
         starting_simulation_number (int): Starting number for new simulation IDs.
+        seed (int): Random seed passed in to ensure consistency between runs.
 
     Returns:
         pl.DataFrame: DataFrame containing resampled and possibly perturbed parameters.
     """
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+        
     # Prepare list to hold new samples
     new_samples = []
 
