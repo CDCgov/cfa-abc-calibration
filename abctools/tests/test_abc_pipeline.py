@@ -1,6 +1,5 @@
 import math
 import os
-import random
 import unittest
 
 import matplotlib.pyplot as plt
@@ -10,7 +9,7 @@ from scipy.stats import uniform
 from abctools import plot_utils, toy_model, abc_methods, SimulationBundle
 
 # Set random seed
-random.seed(12345)
+random_seed = 12345
 
 
 def run_toy_model(params: dict):
@@ -175,6 +174,7 @@ class TestABCPipeline(unittest.TestCase):
                         params_inputs=self.experiment_params_prior_dist,
                         n_simulations=self.n_init,
                         add_random_seed=self.stochastic,
+                        seed=random_seed
                     )
                     self.assertEqual(input_df.shape[0], self.n_init)
             else:
@@ -189,6 +189,7 @@ class TestABCPipeline(unittest.TestCase):
                             perturbation_kernels=self.perturbation_kernels,
                             prior_distributions=self.experiment_params_prior_dist,
                             weights=sim_bundles[step_number - 1].weights,
+                            seed=random_seed
                         )
                         self.assertEqual(input_df.shape[0], self.n_init)
                 else:
@@ -197,6 +198,7 @@ class TestABCPipeline(unittest.TestCase):
                             sim_bundles[step_number - 1].accepted,
                             n_samples=self.n_init,
                             weights=sim_bundles[step_number - 1].weights,
+                            seed=random_seed
                         )
                         self.assertEqual(input_df.shape[0], self.n_init)
 
@@ -265,6 +267,7 @@ class TestABCPipeline(unittest.TestCase):
                             n_simulations=n_additional,
                             add_random_seed=self.stochastic,
                             starting_simulation_number=sim_bundle.n_simulations,
+                            seed=random_seed
                         )
                     else:
                         additional_input_df = abc_methods.resample(
@@ -274,6 +277,7 @@ class TestABCPipeline(unittest.TestCase):
                             prior_distributions=self.experiment_params_prior_dist,
                             weights=sim_bundles[step_number - 1].weights,
                             starting_simulation_number=sim_bundle.n_simulations,
+                            seed=random_seed
                         )
 
                     print(
