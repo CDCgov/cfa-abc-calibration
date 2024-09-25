@@ -351,7 +351,7 @@ class TestABCPipeline(unittest.TestCase):
 
         ### Plots
         with self.subTest("Make timeseries plots"):
-            output_folder = "gcm_python_wrappers/tests/figs"
+            output_folder = "abctools/tests/figs"
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
 
@@ -430,7 +430,7 @@ class TestABCPipeline(unittest.TestCase):
                 fig.savefig(file_out)
 
             with self.subTest("Make parameter histograms"):
-                output_folder = "gcm_python_wrappers/tests/figs/parameters"
+                output_folder = "abctools/tests/figs/parameters"
                 if not os.path.exists(output_folder):
                     os.makedirs(output_folder)
 
