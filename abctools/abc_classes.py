@@ -381,3 +381,22 @@ class SimulationBundle:
         number_merged = len(other_bundle.inputs)
 
         self.merge_history[current_merge_index] = number_merged
+        
+    def print(self):
+        """
+        Print key attributes of the SimulationBundle instance.
+        """
+        print("SimulationBundle:")
+        print(f"  Status: {self.status}")
+        print(f"  Step Number: {self.step_number}")
+        print(f"  Baseline Parameters: {self.baseline_params}")
+        print(f"  Experiment Parameters: {self.experiment_params}")
+        print(f"  Number of Simulations: {self.n_simulations}")
+        print(f"  Number of Accepted Simulations: {self.n_accepted}")
+        print(f"  Weights: {self.weights}")
+        if hasattr(self, "distances"):
+            print(f"  Distances: {self.distances}")
+        if hasattr(self, "accepted"):
+            print(f"  Accepted: {self.accepted}")
+        if hasattr(self, "summary_metrics"):
+            print(f"  Summary Metrics: {self.summary_metrics}")
