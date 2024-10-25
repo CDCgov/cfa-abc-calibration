@@ -3,6 +3,7 @@ import pickle
 
 import polars as pl
 
+
 class SimulationBundle:
     """
     A class to keep track of an iteration/generation of simulations (particles)
@@ -287,8 +288,8 @@ class SimulationBundle:
 
     def accept_proportion(self, proportion):
         """
-        Accepts a specified proportion of simulations with the smallest distances. 
-        This method ranks all simulations by their distance values in ascending order 
+        Accepts a specified proportion of simulations with the smallest distances.
+        This method ranks all simulations by their distance values in ascending order
         and selects the top-performing simulations up to the specified proportion.
 
         Args:
@@ -307,11 +308,13 @@ class SimulationBundle:
             raise ValueError("Distances have not been calculated.")
 
         # Calculate the number of simulations to accept based on the given proportion (minimum of 1)
-        num_to_accept = max(1,int(len(self.distances) * proportion))
+        num_to_accept = max(1, int(len(self.distances) * proportion))
 
         # Sort simulations by distance in ascending order and select the best ones
-        sorted_simulations = sorted(self.distances.items(), key=lambda item: item[1])
-        
+        sorted_simulations = sorted(
+            self.distances.items(), key=lambda item: item[1]
+        )
+
         # Initialize/clear accepted simulations dictionary
         self.accepted = {}
 
@@ -328,6 +331,51 @@ class SimulationBundle:
 
             # Store parameters of accepted simulations in an attribute for later use or analysis
             self.accepted[sim_number] = accepted_params
+
+    def collate_accept(self):
+        """
+        Makes a single DataFrame attribute from ABC results of accepted, distance, and inputs.
+
+        Args:
+            self
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: if accept is not previously calculated
+        """
+
+        # Ensure accept is already calculated
+        if not hasattr(self, "accepted"):
+            raise ValueError("Accept has not been calculated.")
+
+        # Ensure accepted and distances have same simulation order
+        if not (self.accepted.keys() == self.distances.keys()):
+            reshuffle_accept = {
+                k: self.accepted[k] for k in list(self.distances.keys())
+            }
+            self.accepted = reshuffle_accept
+
+        # Dummy mapper to join distances and accept with inputs
+        mapper = pl.DataFrame(
+            {
+                "simulation": list(int(k) for k in self.distances.keys()),
+                "distance": list(self.distances.values()),
+            }
+        )
+
+        # Joining results with inputs
+        accept_results = self.inputs.join(mapper, on="simulation", how="left")
+
+        # Adding logical column whether an input was accepted
+        accepted_sims = list(int(k) for k in self.accepted.keys())
+        accept_results = accept_results.with_columns(
+            pl.col("simulation").is_in(accepted_sims).alias("accept_bool")
+        )
+
+        # Store parameters in a DataFrame attribute for later analysis and diagnostics
+        self.accept_results = accept_results
 
     def merge_with(self, other_bundle):
         """
