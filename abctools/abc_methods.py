@@ -13,7 +13,7 @@ def draw_simulation_parameters(
     add_random_seed: bool = True,
     add_simulation_id: bool = True,
     starting_simulation_number: int = 0,
-    seed = None,
+    seed=None,
 ) -> pl.DataFrame:
     """
     Draw samples of parameters for simulations based on the specified method.
@@ -34,7 +34,7 @@ def draw_simulation_parameters(
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
-        
+
     num_params = len(params_inputs)
 
     if method == "random":
@@ -114,7 +114,7 @@ def resample(
     weights=None,
     add_random_seed: bool = True,
     starting_simulation_number=0,
-    seed = None
+    seed=None,
 ):
     """
     Resamples parameters from accepted simulations with optional perturbation and reweighting.
@@ -135,7 +135,7 @@ def resample(
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)
-        
+
     # Prepare list to hold new samples
     new_samples = []
 
@@ -287,6 +287,7 @@ def calculate_weights_abcsmc(
         }
 
     return new_weights
+
 
 def get_truncated_normal(mean, sd, low=0, upp=1):
     return truncnorm((low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
