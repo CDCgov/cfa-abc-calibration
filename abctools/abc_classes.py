@@ -3,6 +3,7 @@ import pickle
 
 import polars as pl
 
+
 class SimulationBundle:
     """
     A class to keep track of an iteration/generation of simulations (particles)
@@ -287,8 +288,8 @@ class SimulationBundle:
 
     def accept_proportion(self, proportion):
         """
-        Accepts a specified proportion of simulations with the smallest distances. 
-        This method ranks all simulations by their distance values in ascending order 
+        Accepts a specified proportion of simulations with the smallest distances.
+        This method ranks all simulations by their distance values in ascending order
         and selects the top-performing simulations up to the specified proportion.
 
         Args:
@@ -307,11 +308,13 @@ class SimulationBundle:
             raise ValueError("Distances have not been calculated.")
 
         # Calculate the number of simulations to accept based on the given proportion (minimum of 1)
-        num_to_accept = max(1,int(len(self.distances) * proportion))
+        num_to_accept = max(1, int(len(self.distances) * proportion))
 
         # Sort simulations by distance in ascending order and select the best ones
-        sorted_simulations = sorted(self.distances.items(), key=lambda item: item[1])
-        
+        sorted_simulations = sorted(
+            self.distances.items(), key=lambda item: item[1]
+        )
+
         # Initialize/clear accepted simulations dictionary
         self.accepted = {}
 
