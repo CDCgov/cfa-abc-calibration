@@ -332,6 +332,38 @@ class SimulationBundle:
             # Store parameters of accepted simulations in an attribute for later use or analysis
             self.accepted[sim_number] = accepted_params
 
+    def collate_accepted(self):
+        """
+        Collates all accepted simulations into a single DataFrame for further analysis or processing.
+
+        Returns:
+            accepted_df (pl.DataFrame): A DataFrame containing all accepted simulations.
+        """
+
+        # Check if any simulations have been accepted
+        if not hasattr(self, "accepted"):
+            raise ValueError("Accepted simulations have not been stored.")
+
+        # Dummy mapper to join distances with inputs
+        mapper = pl.DataFrame(
+            {
+                "simulation": list(int(k) for k in self.distances.keys()),
+                "distance": list(self.distances.values()),
+            }
+        )
+
+        # Joining distances with inputs
+        accept_results = self.inputs.join(mapper, on="simulation", how="inner")
+
+        # Adding logical column whether an input is accepted
+        accepted_sims = list(int(k) for k in self.accepted.keys())
+        accept_results = accept_results.with_columns(
+            pl.col("simulation").is_in(accepted_sims).alias("accepted_sim")
+        )
+
+        # Store the collated DataFrame in an attribute for later use or analysis
+        self.accept_results = accept_results
+
     def merge_with(self, other_bundle):
         """
         Merges another SimulationBundle object into this one by combining their inputs,
