@@ -325,6 +325,30 @@ class TestABCPipeline(unittest.TestCase):
                 )
                 self.assertGreaterEqual(sim_bundle.n_accepted, self.n_required)
 
+            with self.subTest(
+                f"Collate accepted simulations, step #{step_number}"
+            ):
+                # Collate results from distance calculations
+                sim_bundle.collate_accepted()
+
+                # Ensure the accepted logical column is present
+                self.assertIn(
+                    "accepted_sim", sim_bundle.accept_results.columns
+                )
+
+                # Ensure the sum of TRUE counts in logical column is the number of accepted sims
+                self.assertEqual(
+                    sim_bundle.accept_results["accepted_sim"].sum(),
+                    sim_bundle.n_accepted,
+                )
+
+                # Check that distance values with accepted_sim == True are less than or equal to tolerance
+                accept_above_max = sim_bundle.accept_results.filter(
+                    pl.col("accepted_sim")
+                ).filter(pl.col("distance") > self.tolerance[step_number])
+
+                self.assertTrue(accept_above_max.is_empty())
+
             with self.subTest(f"Calculate weights, step #{step_number}"):
                 if step_number == 0:
                     # uniform weights on the initial step
