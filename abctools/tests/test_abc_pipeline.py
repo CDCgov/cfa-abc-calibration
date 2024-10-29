@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import polars as pl
 from scipy.stats import uniform
 
-from abctools import SimulationBundle, abc_methods, plot_utils, toy_model
+from abctools import abc_methods, plot_utils, toy_model
+from abctools.abc_classes import SimulationBundle
 
 # Set random seed
 random_seed = 12345
