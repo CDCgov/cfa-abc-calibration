@@ -255,8 +255,13 @@ def apply_perturbations(
             )  # Create a unique RNG for each element
             while True:
                 perturbed_value = value + kernel.rvs(random_state=rng)
+                try:
+                    prior_value = prior.pdf(perturbed_value)
+                except AttributeError:
+                    prior_value = prior.pmf(perturbed_value)
                 if (
-                    prior.pdf(perturbed_value) > 0
+                    
+                    prior_value > 0
                 ):  # Ensure the value is valid within the prior
                     perturbed_values.append(perturbed_value)
                     break
@@ -322,7 +327,11 @@ def calculate_weights_abcsmc(
         prior_prob = 1.0
         simulation_id = current_particle["simulation"]
         for key in prior_distributions.keys():
-            prior_prob *= prior_distributions[key].pdf(current_particle[key])
+            try:
+                prior_prob *= prior_distributions[key].pdf(current_particle[key])
+            except AttributeError:
+                prior_prob *= prior_distributions[key].pmf(current_particle[key])
+            
         # Multiply prior probability by proportion of simulations accepted
         numerator = prior_prob * current_particle["acceptance_weight"]
 
@@ -332,7 +341,10 @@ def calculate_weights_abcsmc(
             for key in perturbation_kernels.keys():
                 kernel = perturbation_kernels[key]
                 dist = current_particle[key] - past_particle[key]
-                perturbation_prob *= kernel.pdf(dist)
+                try:
+                    perturbation_prob *= kernel.pdf(dist)
+                except AttributeError:
+                    perturbation_prob *= kernel.pmf(dist)
             denominator += (
                 perturbation_prob
                 * prev_weights.filter(

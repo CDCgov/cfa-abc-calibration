@@ -230,7 +230,7 @@ class SimulationBundle:
         self.summary_metrics = grouped_results
 
     def calculate_distances(
-        self, target_data, distance_function, use_summary_metrics=False
+        self, target_data, distance_function, modifier, use_summary_metrics=False
     ):
         """
         Calculates distances between simulation results and target data using a user-defined distance function.
@@ -250,6 +250,15 @@ class SimulationBundle:
         else:
             data_to_use = self.results
 
+        data_to_use = data_to_use.join(modifier, on="simulation", how="left")
+        # Round the 'burn_in_column' to the nearest value divisible by 7
+        data_to_use = data_to_use.with_columns(
+            (pl.col("burn_in_period") // 7 * 7).alias("burn_in_period")
+        )
+        # Add the burn_in_period value to the t value
+        data_to_use = data_to_use.with_columns(
+            (pl.col("t").cast(int) + pl.col("burn_in_period").cast(pl.Int64)).alias("t")
+        )
         self.distances = apply_per_group_preserve_key(
             data_to_use,
             key="simulation",
