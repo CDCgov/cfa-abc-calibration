@@ -376,6 +376,30 @@ class SimulationBundle:
             accepted_params, on="simulation", how="left"
         ).with_columns(pl.lit(1.0).alias("acceptance_weight"))
 
+        # Add weights to the DataFrame if they exist
+        if self.weights is not None:
+            weights_df = pl.from_dict(
+                {
+                    "simulation": list(self.weights.keys()),
+                    "weight": list(self.weights.values()),
+                }
+            )
+
+            self.accept_results = (
+                self.accept_results.join(
+                    weights_df, on="simulation", how="left"
+                )
+                .with_columns(pl.col("weight").fill_null(0))
+                .with_columns(
+                    pl.col("weight")
+                    .max()
+                    .over(
+                        self.inputs.drop(["simulation", "randomSeed"]).columns
+                    )
+                    .alias("weight")
+                )
+            )
+
     def merge_with(self, other_bundle):
         """
         Merges another SimulationBundle object into this one by combining their inputs,
